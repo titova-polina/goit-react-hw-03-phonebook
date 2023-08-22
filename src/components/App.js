@@ -3,21 +3,17 @@ import { Contacts } from './Contacts/Contacts';
 import { GlobalStyle } from './GlobalStyle';
 import { Form } from './Form/Form';
 import { Filter } from './Filter/Filter';
+
 export class App extends Component {
   state = {
-    contacts: [
-      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-    ],
+    contacts: [],
     filter: '',
   };
 
   componentDidMount() {
-    const SavedContacts = localStorage.getItem('contacts');
-    if (SavedContacts) {
-      this.setState({ contacts: JSON.parse(SavedContacts) });
+    const savedContacts = localStorage.getItem('contacts');
+    if (savedContacts) {
+      this.setState({ contacts: JSON.parse(savedContacts) });
     }
   }
 
@@ -31,46 +27,43 @@ export class App extends Component {
     }
   }
 
-  handleDelete = quizId => {
-    this.setState(prevState => {
-      return {
-        contacts: prevState.contacts.filter(quiz => quiz.id !== quizId),
-      };
-    });
+  handleDelete = contactId => {
+    this.setState(prevState => ({
+      contacts: prevState.contacts.filter(contact => contact.id !== contactId),
+    }));
   };
 
-  addQuiz = newQuiz => {
+  addContact = newContact => {
     const isContactExists = this.state.contacts.find(
       contact =>
-        contact.name.toLowerCase() === newQuiz.name.toLowerCase() ||
-        contact.number === newQuiz.number
+        contact.name.toLowerCase() === newContact.name.toLowerCase() ||
+        contact.number === newContact.number
     );
 
     if (isContactExists) {
-      return alert(`${newQuiz.name} is already in contacts`);
+      return alert(`${newContact.name} is already in contacts`);
     }
 
-    this.setState(prevState => {
-      return {
-        contacts: [...prevState.contacts, newQuiz],
-      };
-    });
+    this.setState(prevState => ({
+      contacts: [...prevState.contacts, newContact],
+    }));
   };
 
   render() {
     const { filter, contacts } = this.state;
-    const visibleQuizItems = contacts.filter(contact =>
+    const visibleContacts = contacts.filter(contact =>
       contact.name.toLowerCase().includes(filter.toLowerCase())
     );
+
     return (
       <>
         <section>
           <h1>Phonebook</h1>
-          <Form onAdd={this.addQuiz} />
+          <Form onAdd={this.addContact} />
 
           <h2>Contacts</h2>
-          <Filter value={this.props.value} onChange={this.changeNameFilter} />
-          <Contacts contacts={visibleQuizItems} onDelete={this.handleDelete} />
+          <Filter value={filter} onChange={this.changeNameFilter} />
+          <Contacts contacts={visibleContacts} onDelete={this.handleDelete} />
         </section>
         <GlobalStyle />
       </>
